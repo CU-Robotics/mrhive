@@ -39,6 +39,9 @@ impl CameraModel {
     }
 
     /// Exposes the underlying intrinsics array contained in the camera model.
+    ///
+    /// The number of intrinsics varies from model to model so the raw pointer is
+    /// returned instead of a slice.
     pub(crate) fn intrinsics_ptr(&self) -> *const f64 {
         let model = unsafe { self.handle.as_ref() };
         let intrinsics = unsafe { model.__bindgen_anon_1.i.as_ref() };
