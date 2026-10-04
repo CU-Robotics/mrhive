@@ -1,13 +1,15 @@
 use crate::sys;
 use crate::util::MrcalError;
 use std::ffi::CString;
+use std::fmt;
 use std::os::unix::ffi::OsStrExt;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::ptr::NonNull;
 
 /// Loads and stores an mrcal `.cameramodel` for further use.
 pub struct CameraModel {
     pub(crate) handle: NonNull<sys::mrcal_cameramodel_VOID_t>,
+    path: PathBuf,
 }
 
 impl CameraModel {
@@ -27,6 +29,7 @@ impl CameraModel {
         // model was checked for NULL (failure to load) before this, so unwrapping is fine
         Ok(Self {
             handle: NonNull::new(model).unwrap(),
+            path: PathBuf::from(path.as_ref()),
         })
     }
 
@@ -53,6 +56,13 @@ impl CameraModel {
     pub(crate) fn rt_cam_ref(&self) -> &[f64; 6] {
         let model = unsafe { self.handle.as_ref() };
         &model.rt_cam_ref
+    }
+}
+
+impl fmt::Debug for CameraModel {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        // just log the path that this cameramodel was loaded from
+        fmt::Debug::fmt(&self.path, f)
     }
 }
 
